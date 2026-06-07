@@ -20,7 +20,6 @@ const Navbar = () => {
         <div className="hidden md:flex items-center gap-6">
           <a className="text-sm font-semibold text-[#c7c4d7] hover:text-[#c0c1ff] transition-colors hover:bg-[#2e3447]/50 px-3 py-2 rounded-md" href="#modes">Features</a>
           <a className="text-sm font-semibold text-[#c7c4d7] hover:text-[#c0c1ff] transition-colors hover:bg-[#2e3447]/50 px-3 py-2 rounded-md" href="#how-it-works">How it Works</a>
-          <a className="text-sm font-semibold text-[#c7c4d7] hover:text-[#c0c1ff] transition-colors hover:bg-[#2e3447]/50 px-3 py-2 rounded-md" href="#pricing">Pricing</a>
         </div>
         
         {/* Right CTA / Action Cluster */}
@@ -51,7 +50,6 @@ const Navbar = () => {
         <div className="px-4 pt-3 pb-6 flex flex-col gap-4 shadow-2xl">
           <a onClick={() => setIsMobileMenuOpen(false)} className="text-base font-medium text-[#c7c4d7] hover:text-[#c0c1ff] py-2 border-b border-[#464554]/10" href="#modes">Features</a>
           <a onClick={() => setIsMobileMenuOpen(false)} className="text-base font-medium text-[#c7c4d7] hover:text-[#c0c1ff] py-2 border-b border-[#464554]/10" href="#how-it-works">How it Works</a>
-          <a onClick={() => setIsMobileMenuOpen(false)} className="text-base font-medium text-[#c7c4d7] hover:text-[#c0c1ff] py-2 border-b border-[#464554]/10" href="#pricing">Pricing</a>
           
           <button 
             onClick={() => { setIsMobileMenuOpen(false); navigate('/signin'); }}

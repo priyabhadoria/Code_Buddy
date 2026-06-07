@@ -1,17 +1,27 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { Terminal, Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle, Loader2 } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle, Loader2 } from 'lucide-react';
+import AuthLayout, { AuthCard, AuthHeader } from '../components/AuthLayout';
+
+function GitHubIcon({ className }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-1.005-.54-1.005-1.005 0-1.005.585 0 1.005.675 1.145.945.66 1.23 1.71 1.77 2.625 1.77.975 0 1.515-.225 1.875-.45.06-.705.405-1.41.735-1.725-2.565-.285-5.25-1.275-5.25-5.655 0-1.245.45-2.265 1.185-3.06-.12-.285-.54-1.365.12-2.835 0 0 .975-.3 3.195 1.17.93-.255 1.92-.39 2.91-.39.99 0 1.98.135 2.91.39 2.22-1.485 3.195-1.17 3.195-1.17.66 1.47.24 2.55.12 2.835.735.795 1.185 1.815 1.185 3.06 0 4.395-2.685 5.37-5.25 5.655.405.345.765.975.765 2.01 0 1.455-.015 2.625-.015 2.985 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
+    </svg>
+  );
+}
 
 const SignIn = () => {
   const navigate = useNavigate();
+  const emailRef = useRef(null);
+  const passwordRef = useRef(null);
+
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
-  // Custom Frontend Error & Loading States
   const [errorMessage, setErrorMessage] = useState('');
-  const [errorType, setErrorType] = useState(''); // 'register' | 'password' | 'generic'
+  const [errorType, setErrorType] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -21,37 +31,41 @@ const SignIn = () => {
     setIsLoading(true);
 
     try {
-      const API_URL = 'http://localhost:3000/api/auth/user/login'; 
-      
-      const response = await axios.post(API_URL, {
-        email: email.trim(),
-        password: password
-      }, { withCredentials: true });
+      const response = await axios.post(
+        'http://localhost:3000/api/auth/user/login',
+        { email: email.trim(), password },
+        { withCredentials: true }
+      );
 
-      // Success Case
       if (response.status === 200 || response.status === 201) {
         if (response.data.token) {
-          localStorage.setItem("token", response.data.token);
+          localStorage.setItem('token', response.data.token);
         }
-        navigate("/dashboard"); 
+        navigate('/dashboard');
       }
-
     } catch (error) {
-      console.error("Authentication Error:", error);
-
       if (error.response) {
         const statusCode = error.response.status;
         const serverMessage = error.response.data?.message?.toLowerCase() || '';
 
-        if (statusCode === 404 || serverMessage.includes('email') || serverMessage.includes('user') || serverMessage.includes('not found')) {
+        if (
+          statusCode === 404 ||
+          serverMessage.includes('email') ||
+          serverMessage.includes('user') ||
+          serverMessage.includes('not found')
+        ) {
           setErrorType('register');
           setErrorMessage('This email is not registered. Please create an account.');
-        } 
-        else if (statusCode === 401 || serverMessage.includes('password') || serverMessage.includes('invalid credential')) {
+          emailRef.current?.focus();
+        } else if (
+          statusCode === 401 ||
+          serverMessage.includes('password') ||
+          serverMessage.includes('invalid credential')
+        ) {
           setErrorType('password');
           setErrorMessage('Incorrect password. Please try again.');
-        } 
-        else {
+          passwordRef.current?.focus();
+        } else {
           setErrorType('generic');
           setErrorMessage(error.response.data?.message || 'Something went wrong. Please try again.');
         }
@@ -65,158 +79,159 @@ const SignIn = () => {
   };
 
   return (
-    <div className="bg-[#0c1324] text-[#dce1fb] min-h-screen flex items-center justify-center relative overflow-hidden font-['Plus_Jakarta_Sans'] selection:bg-[#8083ff] selection:text-[#0d0096]">
-      
-      <div className="absolute w-[60vw] h-[60vw] rounded-full bg-[radial-gradient(circle,rgba(192,193,255,0.05)_0%,rgba(12,19,36,0)_70%)] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0"></div>
+    <AuthLayout>
+      <AuthCard>
+        <AuthHeader />
+        <p className="text-sm text-muted text-center -mt-4">Sign in to your developer workspace.</p>
 
-      <main className="w-full max-w-md px-4 md:px-0 z-10 relative">
-        <div className="bg-[#0f172a]/60 backdrop-blur-xl border border-[#c0c1ff]/10 border-t-[#c0c1ff]/20 rounded-2xl p-8 flex flex-col gap-6 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)]">
-          
-          {/* Header */}
-          <div className="text-center flex flex-col gap-1">
-            <div onClick={() => navigate('/')} className="flex items-center justify-center gap-2 mb-1 hover:opacity-90 transition-opacity cursor-pointer">
-              <Terminal className="text-[#c0c1ff] w-8 h-8" />
-              <h1 className="text-3xl font-extrabold text-[#c0c1ff] tracking-tight">CodeWise</h1>
+        {errorMessage && (
+          <div
+            role="alert"
+            aria-live="polite"
+            className={`p-3.5 rounded-lg border flex items-start gap-2.5 animate-fade-in ${
+              errorType === 'register'
+                ? 'bg-warning/10 border-warning/30 text-warning'
+                : 'bg-danger/10 border-danger/30 text-danger'
+            }`}
+          >
+            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" aria-hidden="true" />
+            <div className="flex-1 text-sm">
+              <p className="font-medium">{errorMessage}</p>
+              {errorType === 'register' && (
+                <Link
+                  to="/signup"
+                  className="mt-1.5 text-xs font-bold text-accent underline block hover:text-accent-muted"
+                >
+                  Create an account now →
+                </Link>
+              )}
             </div>
-            <p className="text-sm text-[#c7c4d7]">Sign in to your developer workspace.</p>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5 w-full" autoComplete="off">
+          <input type="text" name="prevent_autofill" style={{ display: 'none' }} tabIndex={-1} aria-hidden="true" />
+          <input type="password" name="password_prevent_autofill" style={{ display: 'none' }} tabIndex={-1} aria-hidden="true" />
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-semibold tracking-wide text-text" htmlFor="email">
+              Email Address
+            </label>
+            <div
+              className={`input-field relative flex items-center group ${
+                errorType === 'register' ? 'border-warning/60 ring-2 ring-warning/15' : ''
+              }`}
+            >
+              <Mail className="absolute left-3 text-subtle group-focus-within:text-accent-muted transition-colors w-5 h-5" aria-hidden="true" />
+              <input
+                ref={emailRef}
+                className="w-full bg-transparent border-none text-text pl-10 pr-4 py-3 focus:ring-0 placeholder:text-subtle text-sm focus:outline-none disabled:opacity-50"
+                id="email"
+                type="email"
+                name="email_secure"
+                placeholder="developer@codebuddy.io"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
+                autoComplete="one-time-code"
+                aria-invalid={errorType === 'register'}
+                required
+              />
+            </div>
           </div>
 
-          {/* Custom Alerts Box */}
-          {errorMessage && (
-            <div className={`p-3.5 rounded-lg border flex items-start gap-2.5 animate-fadeIn transition-all duration-300 ${
-              errorType === 'register' 
-                ? 'bg-amber-500/10 border-amber-500/30 text-amber-300' 
-                : 'bg-red-500/10 border-red-500/30 text-red-300'
-            }`}>
-              <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-              <div className="flex-1 text-sm">
-                <p className="font-medium">{errorMessage}</p>
-                {errorType === 'register' && (
-                  <button 
-                    type="button" 
-                    onClick={() => navigate('/signup')} 
-                    className="mt-1.5 text-xs font-bold text-white underline block hover:text-[#c0c1ff]"
-                  >
-                    Create an account now →
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Form with AutoComplete Disabled */}
-          <form 
-            onSubmit={handleSubmit} 
-            className="flex flex-col gap-5 w-full"
-            autoComplete="off"
-          >
-            {/* Fake inputs to fool modern browser password managers */}
-            <input type="text" name="prevent_autofill" id="prevent_autofill" style={{display: 'none'}} />
-            <input type="password" name="password_prevent_autofill" id="password_prevent_autofill" style={{display: 'none'}} />
-            
-            {/* Email Field */}
-            <div className="flex flex-col gap-1 relative">
-              <label className="text-xs font-semibold tracking-wide text-[#dce1fb]" htmlFor="email">
-                Email Address
+          <div className="flex flex-col gap-1.5">
+            <div className="flex justify-between items-center w-full">
+              <label className="text-sm font-semibold tracking-wide text-text" htmlFor="password">
+                Password
               </label>
-              <div className={`relative flex items-center bg-[#191f31] rounded-lg border transition-all duration-200 group ${
-                errorType === 'register' ? 'border-amber-500/60 ring-2 ring-amber-500/20' : 'border-[#464554]/30 focus-within:ring-2 focus-within:ring-[#c0c1ff]/20 focus-within:border-[#c0c1ff]'
-              }`}>
-                <Mail className="absolute left-3 text-[#c7c4d7] group-focus-within:text-[#c0c1ff] transition-colors w-5 h-5" />
-                <input
-                  className="w-full bg-transparent border-none text-[#dce1fb] pl-10 pr-4 py-3 focus:ring-0 placeholder:text-[#c7c4d7]/40 text-sm focus:outline-none disabled:opacity-50"
-                  id="email"
-                  type="email"
-                  name="email_secure"
-                  placeholder="developer@codewise.io"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={isLoading}
-                  autoComplete="one-time-code"
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Password Field */}
-            <div className="flex flex-col gap-1 relative">
-              <div className="flex justify-between items-center w-full">
-                <label className="text-xs font-semibold tracking-wide text-[#dce1fb]" htmlFor="password">
-                  Password
-                </label>
-                <button 
-                  type="button"
-                  onClick={() => navigate('/forgot-password')}
-                  className="text-xs font-semibold text-[#c0c1ff] hover:text-[#8083ff] transition-colors focus:outline-none disabled:opacity-50"
-                  disabled={isLoading}
-                >
-                  Forgot?
-                </button>
-              </div>
-              <div className={`relative flex items-center bg-[#191f31] rounded-lg border transition-all duration-200 group ${
-                errorType === 'password' ? 'border-red-500/60 ring-2 ring-red-500/20' : 'border-[#464554]/30 focus-within:ring-2 focus-within:ring-[#c0c1ff]/20 focus-within:border-[#c0c1ff]'
-              }`}>
-                <Lock className="absolute left-3 text-[#c7c4d7] group-focus-within:text-[#c0c1ff] transition-colors w-5 h-5" />
-                <input
-                  className="w-full bg-transparent border-none text-[#dce1fb] pl-10 pr-10 py-3 focus:ring-0 placeholder:text-[#c7c4d7]/40 text-sm focus:outline-none disabled:opacity-50"
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  name="password_secure"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={isLoading}
-                  autoComplete="new-password"
-                  required
-                />
-                <button
-                  className="absolute right-3 text-[#c7c4d7] hover:text-[#dce1fb] transition-colors focus:outline-none flex items-center justify-center disabled:opacity-50"
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  disabled={isLoading}
-                >
-                  {showPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-
-            {/* Button */}
-            <button
-              className="w-full mt-2 bg-[#494bd6] text-white font-semibold text-sm py-3 rounded-lg hover:bg-[#8083ff] transition-all duration-200 shadow-[0_0_15px_rgba(192,193,255,0.2)] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
-              type="submit"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Verifying...
-                </>
-              ) : (
-                <>
-                  Sign In
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </button>
-          </form>
-
-          {/* Sign Up Link */}
-          <div className="text-center border-t border-[#464554]/20 pt-4">
-            <p className="text-xs text-[#c7c4d7]">
-              Don't have an account? 
-              <button 
-                onClick={() => navigate('/signup')} 
-                className="text-[#c0c1ff] hover:text-[#8083ff] font-semibold transition-colors focus:outline-none hover:underline ml-1 disabled:opacity-50"
+              <button
+                type="button"
+                onClick={() => navigate('/forgot-password')}
+                className="text-xs font-semibold text-accent hover:text-accent-indigo-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 rounded disabled:opacity-50"
                 disabled={isLoading}
               >
-                Sign Up
+                Forgot?
               </button>
-            </p>
+            </div>
+            <div
+              className={`input-field relative flex items-center group ${
+                errorType === 'password' ? 'border-danger/60 ring-2 ring-danger/15' : ''
+              }`}
+            >
+              <Lock className="absolute left-3 text-subtle group-focus-within:text-accent-muted transition-colors w-5 h-5" aria-hidden="true" />
+              <input
+                ref={passwordRef}
+                className="w-full bg-transparent border-none text-text pl-10 pr-10 py-3 focus:ring-0 placeholder:text-subtle text-sm focus:outline-none disabled:opacity-50"
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                name="password_secure"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
+                autoComplete="new-password"
+                aria-invalid={errorType === 'password'}
+                required
+              />
+              <button
+                className="absolute right-3 text-subtle hover:text-text transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-muted/50 rounded disabled:opacity-50"
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                disabled={isLoading}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
+          <button
+              className="btn-primary w-full mt-1 text-sm py-3 flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
+            type="submit"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+                Verifying…
+              </>
+            ) : (
+              <>
+                Sign In
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
+              </>
+            )}
+          </button>
+        </form>
+
+        <div className="relative flex items-center justify-center w-full">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-border/30" />
+          </div>
+          <div className="relative px-4">
+            <span className="text-xs text-muted px-2">Or continue with</span>
+          </div>
         </div>
-      </main>
-    </div>
+
+        <button type="button" className="btn-ghost w-full py-3 flex items-center justify-center gap-2 text-sm">
+          <GitHubIcon className="w-5 h-5" />
+          GitHub
+        </button>
+
+        <div className="text-center border-t border-border/20 pt-4">
+          <p className="text-xs text-muted">
+            Don&apos;t have an account?{' '}
+            <Link
+              to="/signup"
+                className="text-accent hover:text-[#8083ff] font-semibold transition-colors focus-visible:outline-none focus-visible:underline"
+            >
+              Sign Up
+            </Link>
+          </p>
+        </div>
+      </AuthCard>
+    </AuthLayout>
   );
 };
 

@@ -1,2 +1,261 @@
 @import "tailwindcss";
 
+/* ─── Mockup design tokens (Code Buddy reference) ─── */
+@theme {
+  /* Surfaces */
+  --color-void: #070d1f;
+  --color-surface: #0c1324;
+  --color-surface-raised: #0f172a;
+  --color-surface-panel: #0f172a;
+  --color-surface-overlay: #151b2d;
+  --color-surface-input: #191f31;
+  --color-surface-hover: #2e3447;
+  --color-surface-code: #000000;
+  --color-surface-chat: #0c1324;
+
+  /* Brand — lavender + indigo from mockups */
+  --color-accent: #c0c1ff;
+  --color-accent-muted: #8083ff;
+  --color-accent-indigo: #494bd6;
+  --color-accent-indigo-hover: #8083ff;
+  --color-accent-on: #1000a9;
+
+  /* Typography */
+  --color-text: #dce1fb;
+  --color-muted: #c7c4d7;
+  --color-subtle: #908fa0;
+  --color-code: #bec6e0;
+
+  /* Borders */
+  --color-border: #464554;
+  --color-border-subtle: #23293c;
+
+  /* Semantic */
+  --color-roast: #ffb4ab;
+  --color-roast-muted: #ffb3ad;
+  --color-success: #86efac;
+  --color-warning: #fbbf24;
+  --color-danger: #f87171;
+
+  /* Shadows */
+  --shadow-glow-accent: 0 0 15px rgb(192 193 255 / 0.2);
+  --shadow-glow-indigo: 0 0 15px rgb(192 193 255 / 0.2);
+  --shadow-card: 0 4px 30px rgb(0 0 0 / 0.3);
+  --shadow-elevated: 0 20px 40px -10px rgb(0 0 0 / 0.5);
+
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background-color: rgb(128 131 255 / 0.35);
+    color: var(--color-text);
+  }
+}
+
+@layer components {
+  /* Solid navy page — matches mockup backgrounds */
+  .page-shell {
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+  }
+
+  .page-glow-orb {
+    position: fixed;
+    width: min(60vw, 36rem);
+    height: min(60vw, 36rem);
+    border-radius: 9999px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(
+      circle,
+      rgb(192 193 255 / 0.05) 0%,
+      rgb(12 19 36 / 0) 70%
+    );
+  }
+
+  /* Sign-in card */
+  .auth-card {
+    background-color: rgb(15 23 42 / 0.6);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgb(192 193 255 / 0.1);
+    border-top-color: rgb(192 193 255 / 0.2);
+    border-radius: 1rem;
+    box-shadow: var(--shadow-elevated);
+  }
+
+  /* Dashboard / review cards */
+  .card {
+    background-color: rgb(15 23 42 / 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgb(70 69 84 / 0.3);
+    border-radius: var(--radius-xl);
+  }
+
+  .card-interactive {
+    background-color: rgb(15 23 42 / 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgb(70 69 84 / 0.3);
+    border-radius: var(--radius-xl);
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  }
+
+  .card-interactive:hover {
+    border-color: rgb(192 193 255 / 0.5);
+  }
+
+  /* Review editor / chat panels */
+  .panel {
+    background-color: var(--color-surface-panel);
+    border: 1px solid rgb(30 41 59 / 1);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+  }
+
+  .panel-roast {
+    border-color: rgb(255 180 171 / 0.3);
+  }
+
+  .panel-header {
+    background-color: var(--color-surface-overlay);
+    border-bottom: 1px solid rgb(70 69 84 / 0.3);
+  }
+
+  /* Indigo — Sign In / Create Account */
+  .btn-primary {
+    background-color: var(--color-accent-indigo);
+    color: white;
+    font-weight: 600;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-glow-indigo);
+    transition: background-color 0.2s, transform 0.15s;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background-color: var(--color-accent-indigo-hover);
+  }
+
+  .btn-primary:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  /* Lavender — Start New Review, Review Code, mode pills */
+  .btn-cta {
+    background-color: var(--color-accent);
+    color: var(--color-accent-on);
+    font-weight: 600;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-glow-accent);
+    transition: background-color 0.2s, transform 0.15s;
+  }
+
+  .btn-cta:hover:not(:disabled) {
+    background-color: #e1e0ff;
+  }
+
+  .btn-cta:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  .btn-cta:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .btn-ghost {
+    background-color: var(--color-surface-input);
+    color: var(--color-text);
+    font-weight: 600;
+    border: 1px solid rgb(70 69 84 / 0.3);
+    border-radius: var(--radius-lg);
+    transition: background-color 0.2s;
+  }
+
+  .btn-ghost:hover:not(:disabled) {
+    background-color: var(--color-surface-hover);
+  }
+
+  .input-field {
+    background-color: var(--color-surface-input);
+    border: 1px solid rgb(70 69 84 / 0.3);
+    border-radius: var(--radius-lg);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .input-field:focus-within {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 2px rgb(192 193 255 / 0.2);
+  }
+
+  /* Sidebar / header active nav — mockup pill */
+  .nav-active {
+    color: var(--color-accent);
+    background-color: rgb(128 131 255 / 0.1);
+    border: 1px solid rgb(192 193 255 / 0.2);
+    box-shadow: 0 0 20px rgb(192 193 255 / 0.1);
+  }
+
+  /* Active review mode pill */
+  .mode-pill-active {
+    background-color: var(--color-accent);
+    color: var(--color-accent-on);
+    box-shadow: 0 0 10px rgb(192 193 255 / 0.2);
+  }
+
+  .mode-pill-active-roast {
+    background-color: #ef4444;
+    color: white;
+    box-shadow: 0 0 10px rgb(239 68 68 / 0.2);
+  }
+
+  /* Chat bubbles */
+  .bubble-user {
+    background-color: rgb(128 131 255 / 0.2);
+    border: 1px solid rgb(128 131 255 / 0.2);
+  }
+
+  .bubble-assistant {
+    background-color: var(--color-surface-hover);
+    border: 1px solid rgb(70 69 84 / 0.2);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.25s ease-out forwards;
+}
